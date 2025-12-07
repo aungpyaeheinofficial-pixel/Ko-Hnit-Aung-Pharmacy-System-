@@ -24,7 +24,8 @@ const Expiry = () => {
     today.setHours(0, 0, 0, 0); // Normalize today to midnight for accuracy
 
     products.forEach(product => {
-      product.batches.forEach(batch => {
+      const batches = product.batches || []; // Fallback for safety
+      batches.forEach(batch => {
         // Skip batches with 0 quantity
         if (batch.quantity <= 0) return;
 
