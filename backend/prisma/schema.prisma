@@ -1,0 +1,365 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  PHARMACIST
+  CASHIER
+}
+
+enum BranchStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  KBZ_PAY
+  CREDIT
+}
+
+enum DistributionStatus {
+  PENDING
+  PACKING
+  DELIVERING
+  COMPLETED
+}
+
+enum PurchaseStatus {
+  PENDING
+  ORDERED
+  RECEIVED
+  CANCELLED
+}
+
+enum ExpenseStatus {
+  PAID
+  PENDING
+}
+
+enum AgingStatus {
+  OVERDUE
+  DUE_SOON
+  NORMAL
+}
+
+model Branch {
+  id            String              @id @default(uuid())
+  name          String
+  code          String              @unique
+  address       String?
+  phone         String?
+  email         String?
+  managerName   String?
+  status        BranchStatus        @default(ACTIVE)
+  products      Product[]
+  customers     Customer[]
+  users         User[]
+  suppliers     Supplier[]
+  transactions  Transaction[]
+  expenses      Expense[]
+  payables      Payable[]
+  receivables   Receivable[]
+  purchaseOrders PurchaseOrder[]
+  distribution  DistributionOrder[]
+  sales         Sale[]
+  scannerLogs   ScannerHistory[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model User {
+  id           String     @id @default(uuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         Role       @default(CASHIER)
+  avatarUrl    String?
+  branchId     String?
+  branch       Branch?    @relation(fields: [branchId], references: [id])
+  sales        Sale[]     @relation("SaleCashier")
+  scannerLogs  ScannerHistory[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Product {
+  id                  String           @id @default(uuid())
+  branchId            String
+  branch              Branch           @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  sku                 String           @unique
+  gtin                String?          @unique
+  nameEn              String
+  nameMm              String
+  genericName         String?
+  category            String
+  description         String?
+  price               Int
+  unit                String
+  stockLevel          Int              @default(0)
+  minStockLevel       Int              @default(0)
+  requiresPrescription Boolean         @default(false)
+  imageUrl            String?
+  location            String?
+  batches             ProductBatch[]
+  saleItems           SaleItem[]
+  distributionItems   DistributionItem[]
+  purchaseItems       PurchaseItem[]
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  @@index([branchId])
+  @@index([category])
+}
+
+model ProductBatch {
+  id          String   @id @default(uuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  batchNumber String
+  expiryDate  DateTime
+  quantity    Int       @default(0)
+  costPrice   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  saleItems   SaleItem[]
+
+  @@unique([productId, batchNumber])
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  branchId  String
+  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  name      String
+  phone     String   @unique
+  points    Int      @default(0)
+  tier      String   @default("Silver")
+  sales     Sale[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branchId])
+}
+
+model Supplier {
+  id          String   @id @default(uuid())
+  branchId    String
+  branch      Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  name        String
+  contact     String?
+  email       String?
+  creditLimit Int      @default(0)
+  outstanding Int      @default(0)
+  purchaseOrders PurchaseOrder[]
+  payables    Payable[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PurchaseOrder {
+  id           String          @id @default(uuid())
+  branchId     String
+  branch       Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  supplierId   String
+  supplier     Supplier        @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  status       PurchaseStatus  @default(PENDING)
+  paymentType  PaymentMethod   @default(CASH)
+  date         DateTime        @default(now())
+  totalAmount  Int             @default(0)
+  notes        String?
+  items        PurchaseItem[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model PurchaseItem {
+  id          String         @id @default(uuid())
+  purchaseId  String
+  purchase    PurchaseOrder  @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product?       @relation(fields: [productId], references: [id])
+  name        String
+  quantity    Int
+  unitCost    Int
+}
+
+model DistributionOrder {
+  id           String             @id @default(uuid())
+  branchId     String
+  branch       Branch             @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  customerName String
+  address      String
+  status       DistributionStatus @default(PENDING)
+  total        Int                @default(0)
+  date         DateTime           @default(now())
+  deliveryTime String?
+  paymentType  PaymentMethod      @default(CASH)
+  items        DistributionItem[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model DistributionItem {
+  id          String            @id @default(uuid())
+  orderId     String
+  order       DistributionOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product?          @relation(fields: [productId], references: [id])
+  name        String
+  quantity    Int
+  price       Int
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  branchId    String
+  branch      Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  type        TransactionType
+  category    String
+  amount      Int
+  date        DateTime        @default(now())
+  description String?
+  paymentMethod PaymentMethod?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model Expense {
+  id          String        @id @default(uuid())
+  branchId    String
+  branch      Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  category    String
+  amount      Int
+  date        DateTime
+  description String?
+  status      ExpenseStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Payable {
+  id          String       @id @default(uuid())
+  branchId    String
+  branch      Branch       @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  supplierId  String?
+  supplier    Supplier?    @relation(fields: [supplierId], references: [id])
+  supplierName String
+  invoiceNo   String
+  amount      Int
+  dueDate     DateTime
+  status      AgingStatus  @default(NORMAL)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Receivable {
+  id           String      @id @default(uuid())
+  branchId     String
+  branch       Branch      @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  customerName String
+  orderRef     String
+  amount       Int
+  dueDate      DateTime
+  status       AgingStatus @default(NORMAL)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Sale {
+  id           String        @id @default(uuid())
+  branchId     String
+  branch       Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  customerId   String?
+  customer     Customer?     @relation(fields: [customerId], references: [id])
+  cashierId    String?
+  cashier      User?         @relation("SaleCashier", fields: [cashierId], references: [id])
+  total        Int
+  paymentMethod PaymentMethod
+  items        SaleItem[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model SaleItem {
+  id        String  @id @default(uuid())
+  saleId    String
+  sale      Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitPrice Int
+  batchId   String?
+  batch     ProductBatch? @relation(fields: [batchId], references: [id])
+}
+
+model AppSetting {
+  id                 Int      @id @default(1)
+  companyName        String   @default("Parami Pharmacy")
+  taxId              String? 
+  phone              String?
+  email              String?
+  address            String?
+  language           String   @default("English")
+  shopNameReceipt    String   @default("Parami Pharmacy")
+  receiptFooter      String   @default("Thank you for your purchase!")
+  paperSize          String   @default("80mm")
+  defaultPrinter     String   @default("System Default")
+  autoPrint          Boolean  @default(false)
+  showImages         Boolean  @default(true)
+  lowStockLimit      Int      @default(10)
+  expiryWarningDays  Int      @default(30)
+  enableEmailReports Boolean  @default(false)
+  enableCriticalAlerts Boolean @default(true)
+  notificationEmail  String? 
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model ScannerHistory {
+  id            String    @id @default(uuid())
+  branchId      String
+  branch        Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  gtin          String?
+  productName   String?
+  batchNumber   String?
+  expiryDate    DateTime?
+  serialNumber  String?
+  quantity      Int       @default(0)
+  unit          String?
+  syncStatus    String    @default("PENDING")
+  syncMessage   String?
+  rawData       String
+  verified      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  logs          SyncLog[]
+}
+
+model SyncLog {
+  id          String          @id @default(uuid())
+  scanId      String
+  scan        ScannerHistory  @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  action      String
+  productName String?
+  oldQuantity Int?
+  newQuantity Int?
+  status      String          @default("SUCCESS")
+  createdAt   DateTime        @default(now())
+}
+
