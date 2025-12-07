@@ -69,9 +69,11 @@ productRouter.post('/', async (req, res, next) => {
 productRouter.patch('/:id', async (req, res, next) => {
   try {
     const input = productSchema.partial().parse(req.body);
+    // Do not allow updating branchId or batches from this endpoint
+    const { batches, branchId, ...productData } = input;
     const product = await prisma.product.update({
       where: { id: req.params.id },
-      data: input,
+      data: productData,
     });
     res.json({ product });
   } catch (error) {
