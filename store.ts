@@ -15,9 +15,9 @@ import { api } from './utils/apiClient';
 // --- Shared Helper for Persistence ---
 const getInitialBranchId = () => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('currentBranchId') || 'b1';
+    return localStorage.getItem('currentBranchId') || '550e8400-e29b-41d4-a716-446655440001';
   }
-  return 'b1';
+  return '550e8400-e29b-41d4-a716-446655440001';
 };
 
 const initialBranchId = getInitialBranchId();
@@ -36,7 +36,7 @@ interface BranchState {
 export const useBranchStore = create<BranchState>((set, get) => ({
   branches: [
     { 
-      id: 'b1', 
+      id: '550e8400-e29b-41d4-a716-446655440001', 
       name: 'ပါရမီ(၁) ထားဝယ်', 
       code: 'parami-1', 
       address: 'No. 45, Arzarni Road, Dawei', 
@@ -46,7 +46,7 @@ export const useBranchStore = create<BranchState>((set, get) => ({
       status: 'active' 
     }, 
     { 
-      id: 'b2', 
+      id: '550e8400-e29b-41d4-a716-446655440002', 
       name: 'ပါရမီ(၂) ရန်ကုန်', 
       code: 'parami-2', 
       address: 'No. 12, Pyay Road, Yangon',

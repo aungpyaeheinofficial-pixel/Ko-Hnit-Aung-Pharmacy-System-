@@ -17,7 +17,7 @@ async function seed() {
 
   const branches = [
     {
-      id: 'b1',
+      id: '550e8400-e29b-41d4-a716-446655440001', // Valid UUID
       name: 'Parami (1) Dawei',
       code: 'parami-1',
       address: 'No. 45, Arzarni Road, Dawei',
@@ -25,7 +25,7 @@ async function seed() {
       managerName: 'U Mg Mg',
     },
     {
-      id: 'b2',
+      id: '550e8400-e29b-41d4-a716-446655440002', // Valid UUID
       name: 'Parami (2) Yangon',
       code: 'parami-2',
       address: 'No. 12, Pyay Road, Yangon',
@@ -51,8 +51,7 @@ async function seed() {
       email: 'admin@parami.com',
       passwordHash,
       role: Role.ADMIN,
-      branchId: 'b1',
-      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
+      branchId: '550e8400-e29b-41d4-a716-446655440001',
     },
   });
 
@@ -65,15 +64,14 @@ async function seed() {
       email: 'pos@parami.com',
       passwordHash,
       role: Role.CASHIER,
-      branchId: 'b1',
-      avatarUrl: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
+      branchId: '550e8400-e29b-41d4-a716-446655440001',
     },
   });
 
   const products = [
     {
       id: 'p1',
-      branchId: 'b1',
+      branchId: '550e8400-e29b-41d4-a716-446655440001',
       sku: '8850123456789',
       gtin: '08850123456789',
       nameEn: 'Paracetamol 500mg',
@@ -106,7 +104,7 @@ async function seed() {
     },
     {
       id: 'p2',
-      branchId: 'b1',
+      branchId: '550e8400-e29b-41d4-a716-446655440001',
       sku: '8859876543210',
       gtin: '08859876543210',
       nameEn: 'Amoxicillin 250mg',
@@ -131,7 +129,7 @@ async function seed() {
     },
     {
       id: 'p3',
-      branchId: 'b2',
+      branchId: '550e8400-e29b-41d4-a716-446655440002',
       sku: '8851111111111',
       gtin: '08851111111111',
       nameEn: 'Vitamin C 1000mg',
@@ -205,7 +203,7 @@ async function seed() {
     update: {},
     create: {
       id: 'po1',
-      branchId: 'b1',
+      branchId: '550e8400-e29b-41d4-a716-446655440001',
       supplierId: 's1',
       status: PurchaseStatus.RECEIVED,
       paymentType: PaymentMethod.CREDIT,
@@ -224,7 +222,7 @@ async function seed() {
     update: {},
     create: {
       id: 'ord1',
-      branchId: 'b1',
+      branchId: '550e8400-e29b-41d4-a716-446655440001',
       customerName: 'City Mart',
       address: 'No 1, Pyay Rd',
       status: DistributionStatus.PENDING,
@@ -260,7 +258,7 @@ async function seed() {
   await prisma.payable.create({
     data: {
       id: 'py1',
-      branchId: 'b1',
+      branchId: '550e8400-e29b-41d4-a716-446655440001',
       supplierId: 's1',
       supplierName: 'AA Medical',
       invoiceNo: 'INV-001',
@@ -273,7 +271,7 @@ async function seed() {
   await prisma.receivable.create({
     data: {
       id: 'rc1',
-      branchId: 'b1',
+      branchId: '550e8400-e29b-41d4-a716-446655440001',
       customerName: 'City Mart',
       orderRef: 'ord1',
       amount: 150_000,
