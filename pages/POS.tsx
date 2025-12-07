@@ -1,11 +1,19 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
+
+// Local JSX namespace so TypeScript understands JSX in this file
+declare namespace JSX {
+  interface IntrinsicElements {
+    [elemName: string]: any;
+  }
+}
 import { Search, Plus, Minus, Trash2, User, CreditCard, Banknote, QrCode, RotateCcw, Save, ShoppingCart, ScanLine, Image as ImageIcon, CheckCircle, AlertCircle, X, Check, Lock, AlertTriangle, Package } from 'lucide-react';
 import { useCartStore, useProductStore, useTransactionStore, useCustomerStore, useBranchStore } from '../store';
 import { Button, Input, Badge } from '../components/UI';
 import { Product, Transaction, UNIT_TYPES } from '../types';
 import CameraScanner from '../components/CameraScanner';
 import { parseBarcode, GS1ParsedData } from '../utils/gs1Parser';
+import { api } from '../utils/apiClient';
 
 const ProductCard: React.FC<{ product: Product, onAdd: (p: Product) => void, index: number }> = ({ product, onAdd, index }) => (
   <div 
@@ -50,7 +58,7 @@ const ProductCard: React.FC<{ product: Product, onAdd: (p: Product) => void, ind
 
 const POS = () => {
   const { items, addItem, removeItem, updateQuantity, total, clearCart, customer, setCustomer } = useCartStore();
-  const { products, addProduct } = useProductStore();
+  const { products, addProduct, syncWithBranch } = useProductStore();
   const { customers } = useCustomerStore();
   const { addTransaction } = useTransactionStore();
   const { currentBranchId } = useBranchStore();
@@ -258,24 +266,37 @@ const POS = () => {
       }
   };
 
-  const handleCheckout = () => {
-    const totalAmount = total();
-    const newTransaction: Transaction = {
-      id: `TRX-${Date.now()}`,
-      type: 'INCOME',
-      category: 'Sales',
-      amount: totalAmount,
-      date: new Date().toISOString().split('T')[0],
-      description: `POS Sale - ${items.length} items`,
-      paymentMethod: 'CASH',
-      branchId: currentBranchId,
-    };
-    
-    addTransaction(newTransaction);
-    setPaymentModalOpen(false);
-    clearCart();
-    setSuccessMsg('Transaction Completed Successfully!');
-    setTimeout(() => setSuccessMsg(''), 3000);
+  const handleCheckout = async () => {
+    try {
+      const totalAmount = total();
+      const payload = {
+        branchId: currentBranchId,
+        customerId: customer?.id,
+        paymentMethod: 'CASH', // extend later for other methods
+        total: totalAmount,
+        items: items.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+          unitPrice: item.price,
+          batchId: (item as any).selectedBatchId || item.batches?.[0]?.id || undefined,
+        })),
+      };
+
+      await api.post('/sales/checkout', payload);
+
+      // Refresh stock from backend
+      if (currentBranchId) {
+        await syncWithBranch(currentBranchId);
+      }
+
+      setPaymentModalOpen(false);
+      clearCart();
+      setSuccessMsg('Transaction Completed Successfully!');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (e: any) {
+      console.error('Checkout failed', e);
+      alert(`Checkout failed: ${e?.message || 'Unknown error'}`);
+    }
   };
 
   return (

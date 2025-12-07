@@ -4,6 +4,13 @@ import { prisma } from '../../config/prisma';
 import { createError } from '../../lib/http-error';
 import { requireAuth } from '../../middleware/auth';
 
+const batchSchema = z.object({
+  batchNumber: z.string().min(1),
+  expiryDate: z.string().transform((val) => new Date(val)),
+  quantity: z.number().int(),
+  costPrice: z.number().int().nonnegative(),
+});
+
 const productSchema = z.object({
   branchId: z.string().uuid(),
   sku: z.string().min(4),
@@ -19,13 +26,7 @@ const productSchema = z.object({
   requiresPrescription: z.boolean().default(false),
   imageUrl: z.string().url().optional(),
   location: z.string().optional(),
-});
-
-const batchSchema = z.object({
-  batchNumber: z.string().min(1),
-  expiryDate: z.string().transform((val) => new Date(val)),
-  quantity: z.number().int(),
-  costPrice: z.number().int().nonnegative(),
+  batches: z.array(batchSchema).optional(), // allow creating batches on new product
 });
 
 export const productRouter = Router();
@@ -50,7 +51,14 @@ productRouter.post('/', async (req, res, next) => {
   try {
     const input = productSchema.parse(req.body);
     const product = await prisma.product.create({
-      data: input,
+      data: {
+        ...input,
+        batches: input.batches
+          ? {
+              create: input.batches,
+            }
+          : undefined,
+      },
     });
     res.status(201).json({ product });
   } catch (error) {

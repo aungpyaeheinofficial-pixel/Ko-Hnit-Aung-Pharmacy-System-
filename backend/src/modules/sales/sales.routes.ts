@@ -6,7 +6,8 @@ import { createError } from '../../lib/http-error';
 import { requireAuth } from '../../middleware/auth';
 
 const saleItemSchema = z.object({
-  productId: z.string().uuid(),
+  // Some seed data uses non-UUID product IDs like "p1", so we accept any non-empty string here
+  productId: z.string().min(1),
   quantity: z.number().int().positive(),
   unitPrice: z.number().int().nonnegative(),
   batchId: z.string().optional(),
@@ -14,7 +15,8 @@ const saleItemSchema = z.object({
 
 const checkoutSchema = z.object({
   branchId: z.string().uuid(),
-  customerId: z.string().uuid().optional(),
+  // Customer IDs in seed data are also non-UUID (e.g. "c1"), so relax validation here
+  customerId: z.string().optional(),
   paymentMethod: z.enum(['CASH', 'CARD', 'KBZ_PAY', 'CREDIT']),
   items: z.array(saleItemSchema).min(1),
   total: z.number().int().nonnegative(),
