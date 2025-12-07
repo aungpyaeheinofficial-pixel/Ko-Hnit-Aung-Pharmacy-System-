@@ -23,7 +23,7 @@ customerRouter.get('/', async (req, res, next) => {
         branchId: branchId ? String(branchId) : undefined,
         OR: search
           ? [
-              { name: { contains: String(search), mode: 'insensitive' } },
+              { name: { contains: String(search) } },
               { phone: { contains: String(search) } },
             ]
           : undefined,
