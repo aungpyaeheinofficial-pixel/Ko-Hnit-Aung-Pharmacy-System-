@@ -118,6 +118,8 @@ productRouter.post('/:id/stock-adjust', async (req, res, next) => {
         batchNumber: z.string().optional(),
         expiryDate: z.string().optional(),
         costPrice: z.number().int().nonnegative().optional(),
+        location: z.string().optional(),
+        unit: z.string().optional(),
       })
       .parse(req.body);
 
@@ -131,6 +133,8 @@ productRouter.post('/:id/stock-adjust', async (req, res, next) => {
         where: { id: req.params.id },
         data: {
           stockLevel: product.stockLevel + payload.quantity,
+          location: payload.location ?? undefined,
+          unit: payload.unit ?? undefined,
         },
       });
 
