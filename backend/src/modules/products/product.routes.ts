@@ -17,15 +17,16 @@ const productSchema = z.object({
   gtin: z.string().min(4).optional(),
   nameEn: z.string().min(2),
   nameMm: z.string().min(2),
-  genericName: z.string().optional(),
+  // Allow nulls from existing data / UI for optional text fields
+  genericName: z.string().nullable().optional(),
   category: z.string().min(2),
-  description: z.string().optional(),
+  description: z.string().nullable().optional(),
   price: z.number().int().nonnegative(),
   unit: z.string().min(1),
   minStockLevel: z.number().int().nonnegative().default(0),
   requiresPrescription: z.boolean().default(false),
-  imageUrl: z.string().url().optional(),
-  location: z.string().optional(),
+  imageUrl: z.string().url().nullable().optional(),
+  location: z.string().nullable().optional(),
   batches: z.array(batchSchema).optional(), // allow creating batches on new product
 });
 
@@ -138,7 +139,7 @@ productRouter.post('/:id/stock-adjust', async (req, res, next) => {
       throw createError(404, 'Product not found');
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: typeof prisma) => {
       await tx.product.update({
         where: { id: req.params.id },
         data: {
