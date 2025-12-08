@@ -23,6 +23,8 @@ const productSchema = z.object({
   description: z.string().nullable().optional(),
   price: z.number().int().nonnegative(),
   unit: z.string().min(1),
+  // Allow direct stock editing from Inventory UI
+  stockLevel: z.number().int().nonnegative().default(0),
   minStockLevel: z.number().int().nonnegative().default(0),
   requiresPrescription: z.boolean().default(false),
   imageUrl: z.string().url().nullable().optional(),
