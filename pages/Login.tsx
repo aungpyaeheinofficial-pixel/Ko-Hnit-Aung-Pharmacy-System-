@@ -83,7 +83,7 @@ const Login = () => {
            <div className="w-20 h-20 bg-[#C8000C] rounded-2xl flex items-center justify-center text-white shadow-xl mb-6 mx-auto transform hover:scale-105 transition-transform duration-300">
              <HeartPulse size={40} strokeWidth={2.5} className="drop-shadow-md" />
            </div>
-           <h1 className="text-[32px] font-bold text-gray-900 font-mm leading-tight tracking-tight mb-1">ပါရမီဆေးဆိုင်</h1>
+           <h1 className="text-[32px] font-bold text-gray-900 font-mm leading-tight tracking-tight mb-1">A7 smart pharmacy system</h1>
            <p className="text-gray-500 font-medium text-base tracking-wide">Pharmacy System</p>
         </div>
 

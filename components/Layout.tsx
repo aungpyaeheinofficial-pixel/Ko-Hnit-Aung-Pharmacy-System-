@@ -61,7 +61,7 @@ export const Sidebar = () => {
             <HeartPulse size={24} strokeWidth={2.5} />
           </div>
           <div>
-            <h1 className="font-bold text-lg text-gray-900 leading-none font-mm">ပါရမီဆေးဆိုင်</h1>
+            <h1 className="font-bold text-lg text-gray-900 leading-none font-mm">A7 smart pharmacy system</h1>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Pharmacy System</p>
           </div>
           <button 

@@ -1166,4 +1166,4 @@ export const useSupplierStore = create<SupplierStoreState>((set, get) => ({
   },
 }));
 
-export const useSettingsStore = create<any>((set) => ({ settings: { companyName: 'Parami Pharmacy' }, updateSettings: () => {} }));
+export const useSettingsStore = create<any>((set) => ({ settings: { companyName: 'A7 smart pharmacy system' }, updateSettings: () => {} }));
