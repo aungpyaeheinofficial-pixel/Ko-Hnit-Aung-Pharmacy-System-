@@ -141,7 +141,7 @@ productRouter.post('/:id/stock-adjust', async (req, res, next) => {
       throw createError(404, 'Product not found');
     }
 
-    await prisma.$transaction(async (tx: typeof prisma) => {
+    await prisma.$transaction(async (tx) => {
       await tx.product.update({
         where: { id: req.params.id },
         data: {

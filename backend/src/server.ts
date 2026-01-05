@@ -4,12 +4,12 @@ import { logger } from './config/logger';
 
 // Handle uncaught errors
 process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception:', error);
+  logger.error({ err: error }, 'Uncaught Exception');
   process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  logger.error({ reason, promise }, 'Unhandled Rejection');
   process.exit(1);
 });
 
@@ -19,7 +19,7 @@ try {
     logger.info(`🚀 API listening on http://localhost:${env.PORT}`);
   });
 } catch (error) {
-  logger.error('Failed to start server:', error);
+  logger.error({ err: error }, 'Failed to start server');
   process.exit(1);
 }
 
