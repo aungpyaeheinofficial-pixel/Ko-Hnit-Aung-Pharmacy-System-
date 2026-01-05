@@ -14,5 +14,20 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
 });
 
-export const env = envSchema.parse(process.env);
+let env: z.infer<typeof envSchema>;
+try {
+  env = envSchema.parse(process.env);
+} catch (error) {
+  if (error instanceof z.ZodError) {
+    console.error('❌ Environment variable validation failed:');
+    error.errors.forEach((err) => {
+      console.error(`  - ${err.path.join('.')}: ${err.message}`);
+    });
+    console.error('\nPlease check your .env file and ensure all required variables are set.');
+    process.exit(1);
+  }
+  throw error;
+}
+
+export { env };
 
