@@ -12,11 +12,11 @@ const TabButton = ({ id, label, icon: Icon, active, onClick }: any) => (
     onClick={() => onClick(id)}
     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
       active 
-      ? 'bg-white text-parami shadow-sm border border-slate-200' 
+      ? 'bg-white text-pharmacy shadow-sm border border-slate-200' 
       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
     }`}
   >
-    <Icon size={18} className={active ? 'text-parami' : 'text-slate-400'} />
+    <Icon size={18} className={active ? 'text-pharmacy' : 'text-slate-400'} />
     {label}
   </button>
 );
@@ -269,7 +269,7 @@ const BranchManagement = () => {
                                   <td className="px-6 py-4">
                                       <div className="font-medium text-slate-800 flex items-center gap-2">
                                           {branch.name}
-                                          {isCurrentBranch && <span className="text-[10px] bg-a7/10 text-a7 px-1.5 py-0.5 rounded font-bold">CURRENT</span>}
+                                          {isCurrentBranch && <span className="text-[10px] bg-pharmacy/10 text-pharmacy px-1.5 py-0.5 rounded font-bold">CURRENT</span>}
                                       </div>
                                       <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
                                           <User size={10} /> {branch.managerName || 'No Manager'}
@@ -344,7 +344,7 @@ const BranchManagement = () => {
                                       label="Branch Name" 
                                       value={formData.name} 
                                       onChange={(e: any) => setFormData({...formData, name: e.target.value})} 
-                                      placeholder="e.g. Parami (3) Mandalay" 
+                                      placeholder="e.g. Ko Hnit Aung (3) Mandalay" 
                                       required 
                                   />
                               </div>
@@ -353,7 +353,7 @@ const BranchManagement = () => {
                                       label="Branch Code" 
                                       value={formData.code} 
                                       onChange={(e: any) => setFormData({...formData, code: e.target.value})} 
-                                      placeholder="e.g. parami-3" 
+                                      placeholder="e.g. ko-hnit-aung-3" 
                                       disabled={!!editingBranch} 
                                       required 
                                   />
@@ -379,7 +379,7 @@ const BranchManagement = () => {
                                           name="status" 
                                           checked={formData.status === 'active'} 
                                           onChange={() => setFormData({...formData, status: 'active'})}
-                                          className="text-parami focus:ring-parami w-4 h-4"
+                                          className="text-pharmacy focus:ring-pharmacy w-4 h-4"
                                       />
                                       <span className="text-sm font-medium text-slate-700">Active</span>
                                   </label>
@@ -582,7 +582,7 @@ const PrintingSettings = ({ onSave, loading }: any) => {
                     type="checkbox" 
                     checked={settings.autoPrint} 
                     onChange={(e) => updateSettings({ autoPrint: e.target.checked })}
-                    className="w-5 h-5 text-parami rounded focus:ring-parami" 
+                    className="w-5 h-5 text-pharmacy rounded focus:ring-pharmacy" 
                   />
                 </label>
                 <label className="flex items-center justify-between p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
@@ -591,7 +591,7 @@ const PrintingSettings = ({ onSave, loading }: any) => {
                     type="checkbox" 
                     checked={settings.showImages} 
                     onChange={(e) => updateSettings({ showImages: e.target.checked })}
-                    className="w-5 h-5 text-parami rounded focus:ring-parami" 
+                    className="w-5 h-5 text-pharmacy rounded focus:ring-pharmacy" 
                   />
                 </label>
             </div>
@@ -622,8 +622,8 @@ const BackupSettings = ({ onExport, onClearData, isAdmin }: any) => (
        </div>
 
        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 border border-slate-200 rounded-xl hover:border-a7 hover:shadow-md transition-all group">
-             <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-a7 group-hover:text-white transition-colors">
+          <div className="p-4 border border-slate-200 rounded-xl hover:border-pharmacy hover:shadow-md transition-all group">
+             <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-pharmacy group-hover:text-white transition-colors">
                 <FileJson size={20} />
              </div>
              <h4 className="font-bold text-slate-800 text-sm">Export Data (JSON)</h4>
@@ -633,8 +633,8 @@ const BackupSettings = ({ onExport, onClearData, isAdmin }: any) => (
              </Button>
           </div>
           
-           <div className="p-4 border border-slate-200 rounded-xl hover:border-a7 hover:shadow-md transition-all group">
-             <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-a7 group-hover:text-white transition-colors">
+           <div className="p-4 border border-slate-200 rounded-xl hover:border-pharmacy hover:shadow-md transition-all group">
+             <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-pharmacy group-hover:text-white transition-colors">
                 <RefreshCw size={20} />
              </div>
              <h4 className="font-bold text-slate-800 text-sm">Sync with Cloud</h4>
@@ -729,7 +729,7 @@ const NotificationSettings = ({ onSave, loading }: any) => {
                  type="checkbox" 
                  checked={settings.enableEmailReports}
                  onChange={(e) => updateSettings({ enableEmailReports: e.target.checked })}
-                 className="w-5 h-5 text-parami rounded focus:ring-parami" 
+                 className="w-5 h-5 text-pharmacy rounded focus:ring-pharmacy" 
                />
             </div>
              <div className="flex items-center justify-between">
@@ -746,7 +746,7 @@ const NotificationSettings = ({ onSave, loading }: any) => {
                  type="checkbox" 
                  checked={settings.enableCriticalAlerts}
                  onChange={(e) => updateSettings({ enableCriticalAlerts: e.target.checked })}
-                 className="w-5 h-5 text-parami rounded focus:ring-parami" 
+                 className="w-5 h-5 text-pharmacy rounded focus:ring-pharmacy" 
                />
             </div>
             

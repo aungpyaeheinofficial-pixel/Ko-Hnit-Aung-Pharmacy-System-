@@ -1,0 +1,10 @@
+node_modules
+dist
+*.log
+.env
+.env.local
+*.db
+*.sqlite
+dev.db
+.DS_Store
+prisma/dev.db

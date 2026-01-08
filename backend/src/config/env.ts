@@ -10,7 +10,13 @@ const envSchema = z.object({
     .default('4000')
     .transform((val) => Number(val))
     .pipe(z.number().int().positive()),
-  DATABASE_URL: z.string().url(),
+  DATABASE_URL: z.string().refine(
+    (val) => {
+      // Accept both URL format (for MySQL/PostgreSQL) and file: protocol (for SQLite)
+      return val.startsWith('file:') || z.string().url().safeParse(val).success;
+    },
+    { message: 'DATABASE_URL must be a valid URL or file path (file:...)' }
+  ),
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
 });
 

@@ -37,22 +37,22 @@ export const useBranchStore = create<BranchState>((set, get) => ({
   branches: [
     { 
       id: '550e8400-e29b-41d4-a716-446655440001', 
-      name: 'ပါရမီ(၁) ထားဝယ်', 
-      code: 'parami-1', 
+      name: 'ကိုနှစ်အောင် ဆေးဆိုင် (၁)', 
+      code: 'ko-hnit-aung-1', 
       address: 'No. 45, Arzarni Road, Dawei', 
       phone: '09-420012345',
       managerName: 'U Mg Mg',
-      email: 'branch1@parami.com',
+      email: 'branch1@kohnitaung.com',
       status: 'active' 
     }, 
     { 
       id: '550e8400-e29b-41d4-a716-446655440002', 
-      name: 'ပါရမီ(၂) ရန်ကုန်', 
-      code: 'parami-2', 
+      name: 'ကိုနှစ်အောင် ဆေးဆိုင် (၂)', 
+      code: 'ko-hnit-aung-2', 
       address: 'No. 12, Pyay Road, Yangon',
       phone: '09-420098765', 
       managerName: 'Daw Hla',
-      email: 'branch2@parami.com',
+      email: 'branch2@kohnitaung.com',
       status: 'active'
     } 
   ],
@@ -152,17 +152,20 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email: string, password?: string) => {
     try {
        if (password) {
-          const { token, user } = await api.post('/auth/login', { email, password });
+          const response = await api.post('/auth/login', { email, password });
+          const { token, user } = response;
           localStorage.setItem('token', token);
           set({ user, isAuthenticated: true });
        } else {
           // Legacy mock fallback
-    const user = mockUsers.find(u => u.email === email) || mockUsers[0];
-    set({ user, isAuthenticated: true });
+          const user = mockUsers.find(u => u.email === email) || mockUsers[0];
+          set({ user, isAuthenticated: true });
        }
-    } catch (e) {
+    } catch (e: any) {
        console.error("Login failed", e);
-       throw e;
+       // Extract error message from response
+       const errorMessage = e?.message || 'Login failed. Please check your credentials and database connection.';
+       throw new Error(errorMessage);
     }
   },
   logout: () => {
@@ -189,6 +192,8 @@ interface CartState {
   addItem: (product: Product, options?: AddItemOptions) => void;
   removeItem: (cartId: string) => void;
   updateQuantity: (cartId: string, qty: number) => void;
+  updatePrice: (cartId: string, newPrice: number) => void; // Custom price override
+  updateUnit: (cartId: string, newUnit: string) => void; // Unit conversion
   clearCart: () => void;
   total: () => number;
 }
@@ -234,6 +239,20 @@ export const useCartStore = create<CartState>((set, get) => ({
   removeItem: (cartId) => set({ items: get().items.filter(i => i.cartId !== cartId) }),
   updateQuantity: (cartId, qty) => set({
     items: get().items.map(i => i.cartId === cartId ? { ...i, quantity: Math.max(1, qty) } : i)
+  }),
+  updatePrice: (cartId, newPrice) => set({
+    items: get().items.map(i => 
+      i.cartId === cartId 
+        ? { ...i, price: Math.max(0, newPrice), customPrice: true } // Mark as custom price
+        : i
+    )
+  }),
+  updateUnit: (cartId, newUnit) => set({
+    items: get().items.map(i => 
+      i.cartId === cartId 
+        ? { ...i, unit: newUnit } 
+        : i
+    )
   }),
   clearCart: () => set({ items: [], customer: null }),
   total: () => get().items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
@@ -330,13 +349,16 @@ export const useProductStore = create<ProductState>((set, get) => ({
 
   incrementStock: async (id, batchNumber, quantity, unit, location, expiryDate, costPrice) => {
      try {
+       // Convert costPrice to integer (MMK in cents/kyats)
+       const costPriceInt = costPrice ? Math.round(costPrice) : undefined;
+       
        await api.post(`/products/${id}/stock-adjust`, {
-           quantity,
-           batchNumber,
-           expiryDate,
-           costPrice,
-           location,
-           unit
+           quantity: Math.round(quantity),
+           batchNumber: batchNumber || undefined, // Send undefined instead of null
+           expiryDate: expiryDate || undefined,
+           costPrice: costPriceInt,
+           location: location || undefined,
+           unit: unit || undefined
        });
        
     const currentBranchId = useBranchStore.getState().currentBranchId;
@@ -460,12 +482,12 @@ export const useScannerStore = create<ScannerState>()(
                         syncLogs: [{
                             id: `log-${Date.now()}`,
                             scanId: finalItem.id,
-                            action: 'UPDATE',
+                            action: 'UPDATE' as const,
                             productName: product ? product.nameEn : 'Unknown',
                             oldQuantity: product ? product.stockLevel : 0,
                             newQuantity: product ? product.stockLevel + finalItem.quantity : finalItem.quantity,
                             timestamp: new Date().toISOString(),
-                            status: 'SUCCESS'
+                            status: 'SUCCESS' as const
                         }, ...state.syncLogs].slice(0, 200)
                     }));
                     
@@ -1166,4 +1188,33 @@ export const useSupplierStore = create<SupplierStoreState>((set, get) => ({
   },
 }));
 
-export const useSettingsStore = create<any>((set) => ({ settings: { companyName: 'A7 smart pharmacy system' }, updateSettings: () => {} }));
+interface SettingsState {
+  settings: AppSettings;
+  updateSettings: (updates: Partial<AppSettings>) => void;
+}
+
+export const useSettingsStore = create<SettingsState>((set) => ({ 
+  settings: { 
+    companyName: 'ကိုနှစ်အောင် ဆေးဆိုင်',
+    taxId: '',
+    phone: '',
+    email: '',
+    address: '',
+    language: 'English',
+    shopNameReceipt: 'ကိုနှစ်အောင် ဆေးဆိုင်',
+    receiptFooter: 'Thank you for your purchase!',
+    paperSize: '80mm',
+    defaultPrinter: 'System Default',
+    autoPrint: false,
+    showImages: true,
+    lowStockLimit: 10,
+    expiryWarningDays: 90,
+    expiryCriticalDays: 180,
+    enableEmailReports: false,
+    enableCriticalAlerts: true,
+    notificationEmail: ''
+  }, 
+  updateSettings: (updates) => set((state) => ({
+    settings: { ...state.settings, ...updates }
+  }))
+}));

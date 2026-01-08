@@ -4,8 +4,7 @@ import { Keyboard, ChevronDown } from 'lucide-react';
 const shortcuts = [
   { key: 'F1', label: 'Help', mm: 'အကူအညီ' },
   { key: 'F2', label: 'Search Product', mm: 'ဆေးရှာရန်' },
-  { key: 'F3', label: 'Scan Barcode', mm: 'ဘားကုတ် ဖတ်ရန်' },
-  { key: 'F4', label: 'Manual Input', mm: 'လက်ဖြင့် ရိုက်ရန်' },
+  { key: 'F4', label: 'Quick Add', mm: 'အမြန်ထည့်ရန်' },
   { key: 'F8', label: 'View History', mm: 'မှတ်တမ်း ကြည့်ရန်' },
   { key: 'F10', label: 'Confirm & Save', mm: 'အတည်ပြုပြီး သိမ်းရန်' },
   { key: 'ESC', label: 'Cancel / Back', mm: 'ပယ်ဖျက် / ပြန်ထွက်' },

@@ -1,4 +1,3 @@
-import { AgingStatus, ExpenseStatus, PaymentMethod, TransactionType } from '@prisma/client';
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../config/prisma';
@@ -6,12 +5,12 @@ import { requireAuth } from '../../middleware/auth';
 
 const transactionSchema = z.object({
   branchId: z.string().uuid(),
-  type: z.nativeEnum(TransactionType),
+  type: z.enum(['INCOME', 'EXPENSE']),
   category: z.string().min(2),
   amount: z.number().int(),
   date: z.string().optional(),
   description: z.string().optional(),
-  paymentMethod: z.nativeEnum(PaymentMethod).optional(),
+  paymentMethod: z.enum(['CASH', 'CARD', 'KBZ_PAY', 'CREDIT']).optional(),
 });
 
 const expenseSchema = z.object({
@@ -20,7 +19,7 @@ const expenseSchema = z.object({
   amount: z.number().int(),
   date: z.string(),
   description: z.string().optional(),
-  status: z.nativeEnum(ExpenseStatus).default(ExpenseStatus.PENDING),
+  status: z.enum(['PAID', 'PENDING']).default('PENDING'),
 });
 
 const agingSchema = z.object({
@@ -29,7 +28,7 @@ const agingSchema = z.object({
   reference: z.string().min(2),
   amount: z.number().int(),
   dueDate: z.string(),
-  status: z.nativeEnum(AgingStatus).default(AgingStatus.NORMAL),
+  status: z.enum(['OVERDUE', 'DUE_SOON', 'NORMAL']).default('NORMAL'),
 });
 
 export const financeRouter = Router();

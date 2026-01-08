@@ -1,6 +1,6 @@
 {
-  "name": "A7 smart pharmacy system",
-  "description": "Professional Pharmacy & Distribution System for A7 smart pharmacy system with POS, Inventory, and Analytics.",
+  "name": "ကိုနှစ်အောင် ဆေးဆိုင် စီမံခန့်ခွဲမှု စနစ်",
+  "description": "Professional Pharmacy & Distribution System for Ko Hnit Aung Pharmacy with POS, Inventory, and Analytics.",
   "requestFramePermissions": [
     "camera"
   ]

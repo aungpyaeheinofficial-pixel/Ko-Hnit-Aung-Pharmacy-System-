@@ -10,12 +10,8 @@ import POS from './pages/POS';
 import Inventory from './pages/Inventory';
 import StockEntry from './pages/StockEntry';
 import Expiry from './pages/Expiry';
-import Distribution from './pages/Distribution';
-import Purchase from './pages/Purchase';
 import Finance from './pages/Finance';
-import Customers from './pages/Customers';
 import Settings from './pages/Settings';
-import PharmacyScanner from './components/PharmacyScanner';
 
 const ProtectedLayout = () => {
   const { user } = useAuthStore();
@@ -69,12 +65,8 @@ const App = () => {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/stock-entry" element={<StockEntry />} />
           <Route path="/expiry" element={<Expiry />} />
-          <Route path="/distribution" element={<Distribution />} />
-          <Route path="/purchase" element={<Purchase />} />
           <Route path="/finance" element={<Finance />} />
-          <Route path="/customers" element={<Customers />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/scanner" element={<PharmacyScanner />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

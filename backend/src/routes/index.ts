@@ -20,10 +20,10 @@ router.use('/products', productRouter);
 router.use('/inventory', inventoryRouter);
 router.use('/sales', salesRouter);
 router.use('/customers', customerRouter);
-router.use('/distribution', distributionRouter);
 router.use('/purchase', purchaseRouter);
+router.use('/distribution', distributionRouter);
+router.use('/scanner', scannerRouter);
 router.use('/finance', financeRouter);
 router.use('/settings', settingsRouter);
-router.use('/scanner', scannerRouter);
 router.use('/suppliers', supplierRouter);
 

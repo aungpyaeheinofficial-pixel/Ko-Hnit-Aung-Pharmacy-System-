@@ -1,11 +1,28 @@
 {
-  "name": "parami-pharmacy",
+  "name": "ko-hnit-aung-pharmacy",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "./start-local.sh",
+    "verify": "./verify-local.sh",
+    "clean": "rm -rf dist node_modules/.vite .vite",
+    "clean:all": "rm -rf dist node_modules/.vite .vite backend/node_modules/.vite",
+    "typecheck": "tsc --noEmit",
+    "backend:dev": "cd backend && npm run dev",
+    "backend:build": "cd backend && npm run build",
+    "backend:seed": "cd backend && npm run seed",
+    "backend:migrate": "cd backend && npx prisma migrate dev",
+    "backend:generate": "cd backend && npx prisma generate",
+    "stop": "lsof -ti:4000,5173 | xargs kill 2>/dev/null || echo 'No servers running'",
+    "stop:backend": "lsof -ti:4000 | xargs kill 2>/dev/null || echo 'Backend not running'",
+    "stop:frontend": "lsof -ti:5173 | xargs kill 2>/dev/null || echo 'Frontend not running'",
+    "health": "curl -s http://localhost:4000/health | jq . || echo 'Backend not running'",
+    "test:api": "curl -s -X POST http://localhost:4000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"admin@kohnitaung.com\",\"password\":\"password\"}' | jq -r '.user.email' || echo 'API test failed'",
+    "install:all": "npm install && cd backend && npm install",
+    "postinstall": "echo '✅ Dependencies installed. Run npm run start to begin development.'"
   },
   "dependencies": {
     "react": "^18.2.0",

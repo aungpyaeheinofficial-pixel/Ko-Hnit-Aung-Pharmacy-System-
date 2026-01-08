@@ -1,4 +1,3 @@
-import { DistributionStatus } from '@prisma/client';
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../config/prisma';
@@ -18,7 +17,7 @@ const orderSchema = z.object({
   customerName: z.string().min(2),
   address: z.string().min(2),
   paymentType: z.enum(['CASH', 'CARD', 'KBZ_PAY', 'CREDIT']),
-  status: z.nativeEnum(DistributionStatus).default(DistributionStatus.PENDING),
+  status: z.enum(['PENDING', 'PACKING', 'DELIVERING', 'COMPLETED']).default('PENDING'),
   deliveryTime: z.string().optional(),
   total: z.number().int().nonnegative(),
   items: z.array(distributionItemSchema).min(1),
@@ -88,7 +87,7 @@ distributionRouter.post('/:id/status', async (req, res, next) => {
   try {
     const payload = z
       .object({
-        status: z.nativeEnum(DistributionStatus),
+        status: z.enum(['PENDING', 'PACKING', 'DELIVERING', 'COMPLETED']),
       })
       .parse(req.body);
 

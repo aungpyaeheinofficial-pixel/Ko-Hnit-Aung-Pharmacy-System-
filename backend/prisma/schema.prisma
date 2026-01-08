@@ -3,139 +3,91 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  MANAGER
-  PHARMACIST
-  CASHIER
-}
-
-enum BranchStatus {
-  ACTIVE
-  INACTIVE
-  ARCHIVED
-}
-
-enum TransactionType {
-  INCOME
-  EXPENSE
-}
-
-enum PaymentMethod {
-  CASH
-  CARD
-  KBZ_PAY
-  CREDIT
-}
-
-enum DistributionStatus {
-  PENDING
-  PACKING
-  DELIVERING
-  COMPLETED
-}
-
-enum PurchaseStatus {
-  PENDING
-  ORDERED
-  RECEIVED
-  CANCELLED
-}
-
-enum ExpenseStatus {
-  PAID
-  PENDING
-}
-
-enum AgingStatus {
-  OVERDUE
-  DUE_SOON
-  NORMAL
-}
-
 model Branch {
-  id            String              @id @default(uuid())
-  name          String
-  code          String              @unique
-  address       String?
-  phone         String?
-  email         String?
-  managerName   String?
-  status        BranchStatus        @default(ACTIVE)
-  products      Product[]
-  customers     Customer[]
-  users         User[]
-  suppliers     Supplier[]
-  transactions  Transaction[]
-  expenses      Expense[]
-  payables      Payable[]
-  receivables   Receivable[]
+  id             String              @id @default(uuid())
+  name           String
+  code           String              @unique
+  address        String?
+  phone          String?
+  email          String?
+  managerName    String?
+  status         String              @default("ACTIVE")
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  customers      Customer[]
+  distribution   DistributionOrder[]
+  expenses       Expense[]
+  payables       Payable[]
+  products       Product[]
   purchaseOrders PurchaseOrder[]
-  distribution  DistributionOrder[]
-  sales         Sale[]
-  scannerLogs   ScannerHistory[]
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  receivables    Receivable[]
+  sales          Sale[]
+  scannerLogs    ScannerHistory[]
+  suppliers      Supplier[]
+  transactions   Transaction[]
+  users          User[]
 }
 
 model User {
-  id           String     @id @default(uuid())
+  id           String           @id @default(uuid())
   name         String
-  email        String     @unique
+  email        String           @unique
   passwordHash String
-  role         Role       @default(CASHIER)
+  role         String           @default("CASHIER")
   avatarUrl    String?
   branchId     String?
-  branch       Branch?    @relation(fields: [branchId], references: [id])
-  sales        Sale[]     @relation("SaleCashier")
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  sales        Sale[]           @relation("SaleCashier")
   scannerLogs  ScannerHistory[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  branch       Branch?          @relation(fields: [branchId], references: [id])
 }
 
 model Product {
-  id                  String           @id @default(uuid())
-  branchId            String
-  branch              Branch           @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  sku                 String           @unique
-  gtin                String?          @unique
-  nameEn              String
-  nameMm              String
-  genericName         String?
-  category            String
-  description         String?
-  price               Int
-  unit                String
-  stockLevel          Int              @default(0)
-  minStockLevel       Int              @default(0)
-  requiresPrescription Boolean         @default(false)
-  imageUrl            String?
-  location            String?
-  batches             ProductBatch[]
-  saleItems           SaleItem[]
-  distributionItems   DistributionItem[]
-  purchaseItems       PurchaseItem[]
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
+  id                   String             @id @default(uuid())
+  branchId             String
+  sku                  String             @unique
+  gtin                 String?
+  shortCode            String?
+  nameEn               String
+  nameMm               String
+  genericName          String?
+  category             String
+  description          String?
+  price                Int
+  unit                 String
+  stockLevel           Int                @default(0)
+  minStockLevel        Int                @default(0)
+  requiresPrescription Boolean            @default(false)
+  imageUrl             String?
+  location             String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  distributionItems    DistributionItem[]
+  branch               Branch             @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  batches              ProductBatch[]
+  purchaseItems        PurchaseItem[]
+  saleItems            SaleItem[]
 
   @@index([branchId])
   @@index([category])
+  @@index([shortCode])
 }
 
 model ProductBatch {
-  id          String   @id @default(uuid())
+  id          String     @id @default(uuid())
   productId   String
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   batchNumber String
   expiryDate  DateTime
-  quantity    Int       @default(0)
-  costPrice   Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  quantity    Int        @default(0)
+  costPrice   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  product     Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
   saleItems   SaleItem[]
 
   @@unique([productId, batchNumber])
@@ -144,222 +96,222 @@ model ProductBatch {
 model Customer {
   id        String   @id @default(uuid())
   branchId  String
-  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
   name      String
   phone     String   @unique
   points    Int      @default(0)
   tier      String   @default("Silver")
-  sales     Sale[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  sales     Sale[]
 
   @@index([branchId])
 }
 
 model Supplier {
-  id          String   @id @default(uuid())
-  branchId    String
-  branch      Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  name        String
-  contact     String?
-  email       String?
-  creditLimit Int      @default(0)
-  outstanding Int      @default(0)
+  id             String          @id @default(uuid())
+  branchId       String
+  name           String
+  contact        String?
+  email          String?
+  creditLimit    Int             @default(0)
+  outstanding    Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  payables       Payable[]
   purchaseOrders PurchaseOrder[]
-  payables    Payable[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  branch         Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
 }
 
 model PurchaseOrder {
-  id           String          @id @default(uuid())
-  branchId     String
-  branch       Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  supplierId   String
-  supplier     Supplier        @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-  status       PurchaseStatus  @default(PENDING)
-  paymentType  PaymentMethod   @default(CASH)
-  date         DateTime        @default(now())
-  totalAmount  Int             @default(0)
-  notes        String?
-  items        PurchaseItem[]
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  id          String         @id @default(uuid())
+  branchId    String
+  supplierId  String
+  status      String         @default("PENDING")
+  paymentType String         @default("CASH")
+  date        DateTime       @default(now())
+  totalAmount Int            @default(0)
+  notes       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  items       PurchaseItem[]
+  supplier    Supplier       @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  branch      Branch         @relation(fields: [branchId], references: [id], onDelete: Cascade)
 }
 
 model PurchaseItem {
-  id          String         @id @default(uuid())
-  purchaseId  String
-  purchase    PurchaseOrder  @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
-  productId   String?
-  product     Product?       @relation(fields: [productId], references: [id])
-  name        String
-  quantity    Int
-  unitCost    Int
+  id         String        @id @default(uuid())
+  purchaseId String
+  productId  String?
+  name       String
+  quantity   Int
+  unitCost   Int
+  product    Product?      @relation(fields: [productId], references: [id])
+  purchase   PurchaseOrder @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
 }
 
 model DistributionOrder {
   id           String             @id @default(uuid())
   branchId     String
-  branch       Branch             @relation(fields: [branchId], references: [id], onDelete: Cascade)
   customerName String
   address      String
-  status       DistributionStatus @default(PENDING)
+  status       String             @default("PENDING")
   total        Int                @default(0)
   date         DateTime           @default(now())
   deliveryTime String?
-  paymentType  PaymentMethod      @default(CASH)
-  items        DistributionItem[]
+  paymentType  String             @default("CASH")
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
+  items        DistributionItem[]
+  branch       Branch             @relation(fields: [branchId], references: [id], onDelete: Cascade)
 }
 
 model DistributionItem {
-  id          String            @id @default(uuid())
-  orderId     String
-  order       DistributionOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId   String?
-  product     Product?          @relation(fields: [productId], references: [id])
-  name        String
-  quantity    Int
-  price       Int
+  id        String            @id @default(uuid())
+  orderId   String
+  productId String?
+  name      String
+  quantity  Int
+  price     Int
+  product   Product?          @relation(fields: [productId], references: [id])
+  order     DistributionOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model Transaction {
-  id          String          @id @default(uuid())
-  branchId    String
-  branch      Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  type        TransactionType
-  category    String
-  amount      Int
-  date        DateTime        @default(now())
-  description String?
-  paymentMethod PaymentMethod?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  id            String   @id @default(uuid())
+  branchId      String
+  type          String
+  category      String
+  amount        Int
+  date          DateTime @default(now())
+  description   String?
+  paymentMethod String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  branch        Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
 }
 
 model Expense {
-  id          String        @id @default(uuid())
+  id          String   @id @default(uuid())
   branchId    String
-  branch      Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
   category    String
   amount      Int
   date        DateTime
   description String?
-  status      ExpenseStatus @default(PENDING)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  branch      Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
 }
 
 model Payable {
-  id          String       @id @default(uuid())
-  branchId    String
-  branch      Branch       @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  supplierId  String?
-  supplier    Supplier?    @relation(fields: [supplierId], references: [id])
+  id           String    @id @default(uuid())
+  branchId     String
+  supplierId   String?
   supplierName String
-  invoiceNo   String
-  amount      Int
-  dueDate     DateTime
-  status      AgingStatus  @default(NORMAL)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  invoiceNo    String
+  amount       Int
+  dueDate      DateTime
+  status       String    @default("NORMAL")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  supplier     Supplier? @relation(fields: [supplierId], references: [id])
+  branch       Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
 }
 
 model Receivable {
-  id           String      @id @default(uuid())
+  id           String   @id @default(uuid())
   branchId     String
-  branch       Branch      @relation(fields: [branchId], references: [id], onDelete: Cascade)
   customerName String
   orderRef     String
   amount       Int
   dueDate      DateTime
-  status       AgingStatus @default(NORMAL)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  status       String   @default("NORMAL")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  branch       Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
 }
 
 model Sale {
-  id           String        @id @default(uuid())
-  branchId     String
-  branch       Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  customerId   String?
-  customer     Customer?     @relation(fields: [customerId], references: [id])
-  cashierId    String?
-  cashier      User?         @relation("SaleCashier", fields: [cashierId], references: [id])
-  total        Int
-  paymentMethod PaymentMethod
-  items        SaleItem[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id            String     @id @default(uuid())
+  branchId      String
+  customerId    String?
+  cashierId     String?
+  total         Int
+  paymentMethod String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  cashier       User?      @relation("SaleCashier", fields: [cashierId], references: [id])
+  customer      Customer?  @relation(fields: [customerId], references: [id])
+  branch        Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  items         SaleItem[]
 }
 
 model SaleItem {
-  id        String  @id @default(uuid())
+  id        String        @id @default(uuid())
   saleId    String
-  sale      Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
   productId String
-  product   Product @relation(fields: [productId], references: [id])
   quantity  Int
   unitPrice Int
   batchId   String?
   batch     ProductBatch? @relation(fields: [batchId], references: [id])
+  product   Product       @relation(fields: [productId], references: [id])
+  sale      Sale          @relation(fields: [saleId], references: [id], onDelete: Cascade)
 }
 
 model AppSetting {
-  id                 Int      @id @default(1)
-  companyName        String   @default("Parami Pharmacy")
-  taxId              String? 
-  phone              String?
-  email              String?
-  address            String?
-  language           String   @default("English")
-  shopNameReceipt    String   @default("Parami Pharmacy")
-  receiptFooter      String   @default("Thank you for your purchase!")
-  paperSize          String   @default("80mm")
-  defaultPrinter     String   @default("System Default")
-  autoPrint          Boolean  @default(false)
-  showImages         Boolean  @default(true)
-  lowStockLimit      Int      @default(10)
-  expiryWarningDays  Int      @default(30)
-  enableEmailReports Boolean  @default(false)
-  enableCriticalAlerts Boolean @default(true)
-  notificationEmail  String? 
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                   Int      @id @default(autoincrement())
+  companyName          String   @default("Ko Hnit Aung Pharmacy")
+  taxId                String?
+  phone                String?
+  email                String?
+  address              String?
+  language             String   @default("English")
+  shopNameReceipt      String   @default("Ko Hnit Aung Pharmacy")
+  receiptFooter        String   @default("Thank you for your purchase!")
+  paperSize            String   @default("80mm")
+  defaultPrinter       String   @default("System Default")
+  autoPrint            Boolean  @default(false)
+  showImages           Boolean  @default(true)
+  lowStockLimit        Int      @default(10)
+  expiryWarningDays    Int      @default(90)
+  expiryCriticalDays   Int      @default(180)
+  enableEmailReports   Boolean  @default(false)
+  enableCriticalAlerts Boolean  @default(true)
+  notificationEmail    String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
 
 model ScannerHistory {
-  id            String    @id @default(uuid())
-  branchId      String
-  branch        Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  userId        String?
-  user          User?     @relation(fields: [userId], references: [id])
-  gtin          String?
-  productName   String?
-  batchNumber   String?
-  expiryDate    DateTime?
-  serialNumber  String?
-  quantity      Int       @default(0)
-  unit          String?
-  syncStatus    String    @default("PENDING")
-  syncMessage   String?
-  rawData       String
-  verified      Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-  logs          SyncLog[]
+  id           String    @id @default(uuid())
+  branchId     String
+  userId       String?
+  gtin         String?
+  productName  String?
+  batchNumber  String?
+  expiryDate   DateTime?
+  serialNumber String?
+  quantity     Int       @default(0)
+  unit         String?
+  syncStatus   String    @default("PENDING")
+  syncMessage  String?
+  rawData      String
+  verified     Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  user         User?     @relation(fields: [userId], references: [id])
+  branch       Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  logs         SyncLog[]
 }
 
 model SyncLog {
-  id          String          @id @default(uuid())
+  id          String         @id @default(uuid())
   scanId      String
-  scan        ScannerHistory  @relation(fields: [scanId], references: [id], onDelete: Cascade)
   action      String
   productName String?
   oldQuantity Int?
   newQuantity Int?
-  status      String          @default("SUCCESS")
-  createdAt   DateTime        @default(now())
+  status      String         @default("SUCCESS")
+  createdAt   DateTime       @default(now())
+  scan        ScannerHistory @relation(fields: [scanId], references: [id], onDelete: Cascade)
 }
-

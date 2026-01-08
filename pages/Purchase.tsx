@@ -275,7 +275,7 @@ const Purchase = () => {
              </div>
         )}
 
-        <Button variant="primary" className="gap-2 shadow-lg shadow-parami/20" onClick={handleCreateNew}>
+        <Button variant="primary" className="gap-2 shadow-lg shadow-pharmacy/20" onClick={handleCreateNew}>
              <Plus size={18} /> Create PO
         </Button>
       </div>
@@ -290,7 +290,7 @@ const Purchase = () => {
              action={
                <button 
                  onClick={handleCreateSupplier}
-                 className="flex items-center gap-1.5 px-3 py-1.5 bg-parami/10 text-parami hover:bg-parami/20 rounded-lg text-xs font-bold transition-colors"
+                 className="flex items-center gap-1.5 px-3 py-1.5 bg-pharmacy/10 text-pharmacy hover:bg-pharmacy/20 rounded-lg text-xs font-bold transition-colors"
                >
                  <Plus size={14} /> Add Supplier
                </button>
@@ -321,7 +321,7 @@ const Purchase = () => {
                                <button 
                                  type="button"
                                  onClick={(e) => handleEditSupplier(e, s)}
-                                 className="p-1 text-slate-400 hover:text-a7 hover:bg-slate-100 rounded"
+                                 className="p-1 text-slate-400 hover:text-pharmacy hover:bg-slate-100 rounded"
                                  title="Edit"
                                >
                                  <Edit2 size={14} />
@@ -408,7 +408,7 @@ const Purchase = () => {
                                <button 
                                  type="button"
                                  onClick={(e) => { e.stopPropagation(); handleEdit(po); }}
-                                 className="relative z-10 p-1.5 text-slate-400 hover:bg-slate-100 hover:text-a7 rounded transition-colors"
+                                 className="relative z-10 p-1.5 text-slate-400 hover:bg-slate-100 hover:text-pharmacy rounded transition-colors"
                                  title="Edit"
                                >
                                  <Edit2 size={16} />

@@ -120,7 +120,7 @@ const Customers = () => {
              </div>
         )}
 
-        <Button variant="primary" className="gap-2 shadow-lg shadow-parami/20" onClick={handleAddNew}>
+        <Button variant="primary" className="gap-2 shadow-lg shadow-pharmacy/20" onClick={handleAddNew}>
              <UserPlus size={18} /> Add Customer
         </Button>
       </div>
@@ -292,7 +292,7 @@ const Customers = () => {
                  </div>
                  <div className="flex gap-2">
                    <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                   <Button variant="primary" onClick={handleSave} className="shadow-lg shadow-parami/20">
+                   <Button variant="primary" onClick={handleSave} className="shadow-lg shadow-pharmacy/20">
                       <Save size={18} /> Save Customer
                    </Button>
                  </div>

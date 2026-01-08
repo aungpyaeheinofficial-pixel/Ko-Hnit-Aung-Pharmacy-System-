@@ -151,23 +151,37 @@ productRouter.post('/:id/stock-adjust', async (req, res, next) => {
         },
       });
 
-      if (payload.batchNumber) {
+      // Auto-generate batch number from expiry date if not provided but expiry date exists
+      let batchNumber = payload.batchNumber;
+      if (!batchNumber && payload.expiryDate) {
+        const expiryDate = new Date(payload.expiryDate);
+        // Format: YYYYMMDD (e.g., 20251231)
+        batchNumber = expiryDate.toISOString().split('T')[0].replace(/-/g, '');
+      }
+
+      // Create batch if batchNumber exists or expiryDate is provided
+      if (batchNumber || payload.expiryDate) {
+        const finalBatchNumber = batchNumber || `BATCH-${Date.now()}`;
+        const expiryDate = payload.expiryDate 
+          ? new Date(payload.expiryDate) 
+          : new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+
         await tx.productBatch.upsert({
           where: {
             productId_batchNumber: {
               productId: req.params.id,
-              batchNumber: payload.batchNumber,
+              batchNumber: finalBatchNumber,
             },
           },
           update: {
             quantity: { increment: payload.quantity },
-            expiryDate: payload.expiryDate ? new Date(payload.expiryDate) : undefined,
+            expiryDate: expiryDate,
             costPrice: payload.costPrice ?? undefined,
           },
           create: {
             productId: req.params.id,
-            batchNumber: payload.batchNumber,
-            expiryDate: payload.expiryDate ? new Date(payload.expiryDate) : new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Default 1 year expiry if not provided
+            batchNumber: finalBatchNumber,
+            expiryDate: expiryDate,
             quantity: payload.quantity,
             costPrice: payload.costPrice ?? 0,
           },

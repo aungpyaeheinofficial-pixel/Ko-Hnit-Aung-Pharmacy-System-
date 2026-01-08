@@ -2,9 +2,9 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
-  LayoutDashboard, ShoppingCart, Package, Truck, 
-  Users, BarChart3, Settings, LogOut, Menu, Bell, Search,
-  ChevronDown, HeartPulse, Building2, Check, X, ScanLine, Calendar, ShoppingBag, PlusCircle, Wrench
+  LayoutDashboard, ShoppingCart, Package,
+  Settings, LogOut, Menu, Bell, Search,
+  ChevronDown, Building2, Check, X, Calendar, PlusCircle
 } from 'lucide-react';
 import { useAuthStore, useGlobalStore, useBranchStore } from '../store';
 
@@ -14,20 +14,20 @@ const NavItem = ({ to, icon: Icon, label, subLabel }: { to: string, icon: any, l
     className={({ isActive }) => 
       `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative select-none mb-1 ${
         isActive 
-          ? 'bg-gradient-to-r from-[#C8000C] to-[#E01111] text-white shadow-md shadow-red-900/20' 
-          : 'text-gray-600 hover:bg-red-50 hover:text-[#C8000C]'
+          ? 'bg-gradient-to-r from-[#1B5E20] to-[#2E7D32] text-white shadow-md shadow-green-900/20' 
+          : 'text-gray-600 hover:bg-green-50 hover:text-[#1B5E20]'
       }`
     }
   >
     {({ isActive }) => (
       <>
-        <Icon size={20} className={`shrink-0 transition-colors duration-200 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-[#C8000C]'}`} />
+        <Icon size={20} className={`shrink-0 transition-colors duration-200 ${isActive ? 'text-[#FFEB3B]' : 'text-gray-400 group-hover:text-[#1B5E20]'}`} />
         <div className="flex flex-col relative z-10">
           <span className={`text-sm font-semibold leading-tight ${isActive ? 'text-white' : ''}`}>{label}</span>
-          {subLabel && <span className={`text-[10px] ${isActive ? 'text-white/90' : 'text-gray-400 group-hover:text-[#C8000C]/80'} font-mm leading-tight mt-0.5`}>{subLabel}</span>}
+          {subLabel && <span className={`text-[10px] ${isActive ? 'text-[#FFEB3B]/90' : 'text-gray-400 group-hover:text-[#1B5E20]/80'} font-mm leading-tight mt-0.5`}>{subLabel}</span>}
         </div>
         {isActive && (
-            <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-white/40" />
+            <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-[#FFEB3B]/40" />
         )}
       </>
     )}
@@ -56,13 +56,17 @@ export const Sidebar = () => {
         }`}
       >
         {/* Logo Section */}
-        <div className="h-20 flex items-center gap-3 px-6 border-b border-gray-100 bg-white">
-          <div className="w-10 h-10 bg-[#C8000C] rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-600/20 shrink-0">
-            <HeartPulse size={24} strokeWidth={2.5} />
+        <div className="h-20 flex items-center gap-3 px-6 border-b border-gray-100 bg-[#1B5E20]">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-400/30 shrink-0 overflow-hidden bg-white">
+            <img 
+              src="/assets/logo.jpg" 
+              alt="Ko Hnit Aung Pharmacy Logo" 
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
-            <h1 className="font-bold text-lg text-gray-900 leading-none font-mm">A7 smart pharmacy system</h1>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Pharmacy System</p>
+            <h1 className="font-bold text-lg text-white leading-none font-mm">ကိုနှစ်အောင် ဆေးဆိုင်</h1>
+            <p className="text-[10px] font-bold text-[#FFEB3B] uppercase tracking-widest mt-1">Ko Hnit Aung Pharmacy</p>
           </div>
           <button 
              onClick={toggleSidebar}
@@ -86,18 +90,8 @@ export const Sidebar = () => {
           </div>
 
           <div className="py-2">
-             <div className="h-[1px] bg-gray-100 mx-2 mb-2" />
-             <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Management</p>
-             <NavItem to="/purchase" icon={ShoppingBag} label="Purchasing" subLabel="အဝယ်ပိုင်း" />
-             <NavItem to="/distribution" icon={Truck} label="Distribution" subLabel="ဖြန့်ချိရေး" />
-             <NavItem to="/finance" icon={BarChart3} label="Finance" subLabel="ငွေစာရင်း" />
-             <NavItem to="/customers" icon={Users} label="Customers" subLabel="ဖောက်သည်များ" />
-          </div>
-
-          <div className="py-2">
             <div className="h-[1px] bg-gray-100 mx-2 mb-2" />
-            <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Tools</p>
-            <NavItem to="/scanner" icon={ScanLine} label="Scanner Utility" subLabel="စစ်ဆေးရေး စက်ကိရိယာ" />
+            <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">System</p>
             <NavItem to="/settings" icon={Settings} label="Settings" subLabel="ဆက်တင်များ" />
           </div>
         </div>
@@ -112,11 +106,18 @@ export const Sidebar = () => {
                  <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin" className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 text-left overflow-hidden">
-                 <p className="text-sm font-bold text-gray-800 truncate group-hover:text-[#C8000C] transition-colors">Kaung Kaung</p>
+                 <p className="text-sm font-bold text-gray-800 truncate group-hover:text-[#C8000C] transition-colors">ကိုနှစ်အောင်</p>
                  <p className="text-[10px] font-medium text-gray-500 truncate">Administrator</p>
               </div>
               <LogOut size={18} className="text-gray-400 group-hover:text-red-500 transition-colors" />
            </button>
+        </div>
+
+        {/* Powered By Footer */}
+        <div className="px-4 pb-4 pt-2 border-t border-gray-100">
+          <p className="text-[10px] text-gray-400 text-center font-medium">
+            Powered By <span className="font-bold text-gray-600">A7 System</span>
+          </p>
         </div>
       </aside>
     </>

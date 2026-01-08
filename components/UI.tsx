@@ -29,7 +29,7 @@ export const Button = ({ children, variant = 'primary', className = '', size = '
     outline: "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 focus:ring-slate-200 shadow-sm",
     ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:ring-slate-200",
     danger: "bg-white text-red-600 border border-red-100 hover:bg-red-50 focus:ring-red-200 shadow-sm",
-    parami: "bg-parami-600 text-white hover:bg-parami-700 shadow-lg shadow-parami-500/20 border border-transparent focus:ring-parami-500"
+    pharmacy: "bg-pharmacy-600 text-white hover:bg-pharmacy-700 shadow-lg shadow-pharmacy-500/20 border border-transparent focus:ring-pharmacy-500"
   };
 
   return (
@@ -77,7 +77,7 @@ export const ProgressBar = ({ value, max = 100, variant = 'info', className = ''
     success: 'bg-emerald-500',
     warning: 'bg-amber-500',
     danger: 'bg-red-500',
-    parami: 'bg-parami-600',
+    pharmacy: 'bg-pharmacy-600',
   };
   return (
     <div className={`h-2 w-full bg-slate-100 rounded-full overflow-hidden ${className}`}>

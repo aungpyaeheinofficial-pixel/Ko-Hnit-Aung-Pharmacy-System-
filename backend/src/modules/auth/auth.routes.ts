@@ -21,18 +21,42 @@ export const authRouter = Router();
 authRouter.post('/login', async (req, res, next) => {
   try {
     const { email, password } = loginSchema.parse(req.body);
-    const user = await prisma.user.findUnique({
-      where: { email },
-      select: { id: true, email: true, name: true, passwordHash: true, role: true, branchId: true },
-    });
+    
+    // Try to find user
+    let user;
+    try {
+      user = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true, email: true, name: true, passwordHash: true, role: true, branchId: true },
+      });
+    } catch (dbError: any) {
+      // Database connection error - log and return specific error
+      console.error('Database error during login:', dbError);
+      const errorMessage = dbError?.message || 'Database connection failed';
+      const errorCode = dbError?.code || 'UNKNOWN';
+      
+      // Check if it's a Prisma connection error
+      if (errorCode === 'P1001' || errorMessage.includes('Can\'t reach database server')) {
+        return res.status(503).json({ 
+          message: 'Database connection failed. Please check your database configuration.',
+          error: 'DATABASE_CONNECTION_ERROR'
+        });
+      }
+      
+      // For other database errors, still return a helpful message
+      return res.status(503).json({ 
+        message: 'Database error. Please check database configuration.',
+        error: errorCode
+      });
+    }
 
     if (!user) {
-      throw createError(401, 'Invalid credentials');
+      throw createError(401, 'Invalid email or password');
     }
 
     const isValid = await bcrypt.compare(password, user.passwordHash);
     if (!isValid) {
-      throw createError(401, 'Invalid credentials');
+      throw createError(401, 'Invalid email or password');
     }
 
     const token = jwt.sign(
@@ -52,6 +76,12 @@ authRouter.post('/login', async (req, res, next) => {
       },
     });
   } catch (error) {
+    // If it's already an HttpError, pass it to error handler
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      return next(error);
+    }
+    // For other errors, log and pass to error handler
+    console.error('Login error:', error);
     return next(error);
   }
 });

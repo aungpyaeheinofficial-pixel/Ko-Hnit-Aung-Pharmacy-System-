@@ -190,7 +190,7 @@ const Distribution = () => {
               className="pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-a7/20 w-64"
             />
           </div>
-          <Button variant="primary" className="gap-2 shadow-lg shadow-parami/20 bg-gradient-to-r from-red-500 to-red-600 border-0" onClick={handleNewOrder}>
+          <Button variant="primary" className="gap-2 shadow-lg shadow-pharmacy/20 bg-gradient-to-r from-red-500 to-red-600 border-0" onClick={handleNewOrder}>
             <Plus size={18} /> New Order
           </Button>
         </div>

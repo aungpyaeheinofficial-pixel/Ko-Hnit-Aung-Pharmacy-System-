@@ -102,7 +102,8 @@ export interface Batch {
 export interface Product {
   id: string;
   sku: string;
-  gtin?: string; // Global Trade Item Number (GS1)
+  gtin?: string; // Global Trade Item Number (GS1) - Optional
+  shortCode?: string; // Quick search code (e.g., "BIO" for Biogesic)
   nameEn: string;
   nameMm: string;
   genericName?: string;
@@ -133,6 +134,7 @@ export interface CartItem extends Product {
   selectedBatchId?: string;
   quantity: number;
   discount: number;
+  customPrice?: boolean; // True if price was manually overridden
   // Enhanced Scanning Data
   transaction_data?: {
     scanned_batch: string | null;
@@ -265,6 +267,7 @@ export interface AppSettings {
   showImages: boolean;
   lowStockLimit: number;
   expiryWarningDays: number;
+  expiryCriticalDays?: number; // Critical warning threshold (e.g., 180 days)
   enableEmailReports: boolean;
   enableCriticalAlerts: boolean;
   notificationEmail: string;

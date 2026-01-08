@@ -1,4 +1,3 @@
-import { PaymentMethod, PurchaseStatus } from '@prisma/client';
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../config/prisma';
@@ -17,8 +16,8 @@ const purchaseSchema = z.object({
   branchId: z.string().uuid(),
   // Allow legacy non-UUID supplier IDs (e.g. s1) from existing data
   supplierId: z.string().min(1),
-  status: z.nativeEnum(PurchaseStatus).default(PurchaseStatus.PENDING),
-  paymentType: z.nativeEnum(PaymentMethod).default(PaymentMethod.CASH),
+  status: z.enum(['PENDING', 'ORDERED', 'RECEIVED', 'CANCELLED']).default('PENDING'),
+  paymentType: z.enum(['CASH', 'CARD', 'KBZ_PAY', 'CREDIT']).default('CASH'),
   date: z.string().optional(),
   notes: z.string().optional(),
   totalAmount: z.number().int().nonnegative(),

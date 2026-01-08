@@ -1,4 +1,3 @@
-import { TransactionType } from '@prisma/client';
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../config/prisma';
@@ -96,7 +95,7 @@ salesRouter.post('/checkout', async (req, res, next) => {
       await tx.transaction.create({
         data: {
           branchId: payload.branchId,
-          type: TransactionType.INCOME,
+          type: 'INCOME',
           category: 'Sales',
           amount: payload.total,
           description: `POS Sale (${payload.items.length} items)`,

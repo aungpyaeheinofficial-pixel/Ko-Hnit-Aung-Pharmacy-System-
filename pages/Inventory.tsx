@@ -178,7 +178,7 @@ const Inventory = () => {
           <Button variant="outline" className="gap-2 bg-white hidden sm:flex">
             <Download size={18} /> Export
           </Button>
-          <Button variant="primary" className="gap-2 shadow-lg shadow-parami/20" onClick={handleAddNew}>
+          <Button variant="primary" className="gap-2 shadow-lg shadow-pharmacy/20" onClick={handleAddNew}>
             <Plus size={18} /> Add Product
           </Button>
         </div>
@@ -243,19 +243,10 @@ const Inventory = () => {
                  return (
                     <tr key={product.id} className="hover:bg-slate-50/80 transition-colors group cursor-pointer" onClick={() => handleEdit(product)}>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
-                            {product.image ? (
-                               <img src={product.image} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                               <ImageIcon size={20} className="text-slate-400" />
-                            )}
-                          </div>
-                          <div>
-                            <p className="font-medium text-slate-800 text-sm">{product.nameEn}</p>
-                            <p className="text-xs text-slate-500 font-mm">{product.nameMm}</p>
-                            <p className="text-[10px] text-slate-400 font-mono mt-0.5">SKU: {product.sku}</p>
-                          </div>
+                        <div>
+                          <p className="font-medium text-slate-800 text-sm">{product.nameEn}</p>
+                          <p className="text-xs text-slate-500 font-mm">{product.nameMm}</p>
+                          <p className="text-[10px] text-slate-400 font-mono mt-0.5">SKU: {product.sku}</p>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600">
@@ -412,7 +403,7 @@ const Inventory = () => {
                  </div>
                  <div className="flex gap-3">
                    <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                   <Button variant="primary" type="submit" form="productForm" className="shadow-lg shadow-parami/20">
+                   <Button variant="primary" type="submit" form="productForm" className="shadow-lg shadow-pharmacy/20">
                       <Save size={18} /> {isEditMode ? 'Update Product' : 'Save Product'}
                    </Button>
                  </div>

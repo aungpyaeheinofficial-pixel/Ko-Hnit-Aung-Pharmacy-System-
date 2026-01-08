@@ -123,11 +123,11 @@ const CameraScanner: React.FC<CameraScannerProps> = ({ onScan, onClose, classNam
         
         {/* Viewfinder Overlay for professional feel */}
         <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center">
-            <div className="w-64 h-64 border-2 border-parami/50 rounded-xl relative">
-                <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-parami -mt-1 -ml-1"></div>
-                <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-parami -mt-1 -mr-1"></div>
-                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-parami -mb-1 -ml-1"></div>
-                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-parami -mb-1 -mr-1"></div>
+            <div className="w-64 h-64 border-2 border-pharmacy/50 rounded-xl relative">
+                <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-pharmacy -mt-1 -ml-1"></div>
+                <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-pharmacy -mt-1 -mr-1"></div>
+                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-pharmacy -mb-1 -ml-1"></div>
+                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-pharmacy -mb-1 -mr-1"></div>
                 
                 {/* Crosshair */}
                 <div className="absolute top-1/2 left-1/2 w-4 h-[1px] bg-red-500/50 -translate-x-1/2"></div>

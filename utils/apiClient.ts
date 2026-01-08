@@ -14,8 +14,15 @@ export const api = {
       headers: getHeaders(),
     });
     if (!res.ok) {
-      const error = await res.text();
-      throw new Error(error || res.statusText);
+      let errorMessage = res.statusText;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch {
+        const errorText = await res.text();
+        errorMessage = errorText || res.statusText;
+      }
+      throw new Error(errorMessage);
     }
     return res.json();
   },
@@ -27,8 +34,15 @@ export const api = {
       body: JSON.stringify(data),
     });
     if (!res.ok) {
-      const error = await res.text();
-      throw new Error(error || res.statusText);
+      let errorMessage = res.statusText;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch {
+        const errorText = await res.text();
+        errorMessage = errorText || res.statusText;
+      }
+      throw new Error(errorMessage);
     }
     return res.json();
   },
@@ -40,8 +54,15 @@ export const api = {
       body: JSON.stringify(data),
     });
     if (!res.ok) {
-      const error = await res.text();
-      throw new Error(error || res.statusText);
+      let errorMessage = res.statusText;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch {
+        const errorText = await res.text();
+        errorMessage = errorText || res.statusText;
+      }
+      throw new Error(errorMessage);
     }
     return res.json();
   },
@@ -53,8 +74,15 @@ export const api = {
       body: JSON.stringify(data),
     });
     if (!res.ok) {
-      const error = await res.text();
-      throw new Error(error || res.statusText);
+      let errorMessage = res.statusText;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch {
+        const errorText = await res.text();
+        errorMessage = errorText || res.statusText;
+      }
+      throw new Error(errorMessage);
     }
     return res.json();
   },
@@ -65,8 +93,15 @@ export const api = {
       headers: getHeaders(),
     });
     if (!res.ok) {
-      const error = await res.text();
-      throw new Error(error || res.statusText);
+      let errorMessage = res.statusText;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch {
+        const errorText = await res.text();
+        errorMessage = errorText || res.statusText;
+      }
+      throw new Error(errorMessage);
     }
     return res.json(); // Some DELETEs might return 204 No Content
   },

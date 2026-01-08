@@ -463,7 +463,7 @@ const Finance = () => {
                      <td className="px-6 py-4 text-center">
                         <button 
                             onClick={() => markReceivableCollected(r.id)}
-                            className="bg-a7/10 text-a7 hover:bg-a7/20 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1 mx-auto transition-colors"
+                            className="bg-pharmacy/10 text-pharmacy hover:bg-pharmacy/20 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1 mx-auto transition-colors"
                         >
                             <Check size={14} /> Collect
                         </button>
@@ -520,11 +520,11 @@ const Finance = () => {
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">Status</label>
                     <div className="flex gap-4">
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" checked={newExpense.status === 'PAID'} onChange={() => setNewExpense({...newExpense, status: 'PAID'})} className="text-parami focus:ring-parami" />
+                            <input type="radio" checked={newExpense.status === 'PAID'} onChange={() => setNewExpense({...newExpense, status: 'PAID'})} className="text-pharmacy focus:ring-pharmacy" />
                             <span>Paid</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" checked={newExpense.status === 'PENDING'} onChange={() => setNewExpense({...newExpense, status: 'PENDING'})} className="text-parami focus:ring-parami" />
+                            <input type="radio" checked={newExpense.status === 'PENDING'} onChange={() => setNewExpense({...newExpense, status: 'PENDING'})} className="text-pharmacy focus:ring-pharmacy" />
                             <span>Pending</span>
                         </label>
                     </div>

@@ -1,14 +1,5 @@
 import bcrypt from 'bcryptjs';
-import {
-  AgingStatus,
-  DistributionStatus,
-  ExpenseStatus,
-  PaymentMethod,
-  PrismaClient,
-  PurchaseStatus,
-  Role,
-  TransactionType,
-} from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -18,16 +9,16 @@ async function seed() {
   const branches = [
     {
       id: '550e8400-e29b-41d4-a716-446655440001', // Valid UUID
-      name: 'Parami (1) Dawei',
-      code: 'parami-1',
+      name: 'ကိုနှစ်အောင် ဆေးဆိုင် (၁)',
+      code: 'ko-hnit-aung-1',
       address: 'No. 45, Arzarni Road, Dawei',
       phone: '09-420012345',
       managerName: 'U Mg Mg',
     },
     {
       id: '550e8400-e29b-41d4-a716-446655440002', // Valid UUID
-      name: 'Parami (2) Yangon',
-      code: 'parami-2',
+      name: 'ကိုနှစ်အောင် ဆေးဆိုင် (၂)',
+      code: 'ko-hnit-aung-2',
       address: 'No. 12, Pyay Road, Yangon',
       phone: '09-420098765',
       managerName: 'Daw Hla',
@@ -43,27 +34,27 @@ async function seed() {
   }
 
   await prisma.user.upsert({
-    where: { email: 'admin@parami.com' },
+    where: { email: 'admin@kohnitaung.com' },
     update: {},
     create: {
       id: 'u1',
-      name: 'Kaung Kaung',
-      email: 'admin@parami.com',
+      name: 'ကိုနှစ်အောင်',
+      email: 'admin@kohnitaung.com',
       passwordHash,
-      role: Role.ADMIN,
+      role: 'ADMIN',
       branchId: '550e8400-e29b-41d4-a716-446655440001',
     },
   });
 
   await prisma.user.upsert({
-    where: { email: 'pos@parami.com' },
+    where: { email: 'pos@kohnitaung.com' },
     update: {},
     create: {
       id: 'u2',
-      name: 'Kyaw Kyaw',
-      email: 'pos@parami.com',
+      name: 'ငွေကိုင်ဝန်ထမ်း',
+      email: 'pos@kohnitaung.com',
       passwordHash,
-      role: Role.CASHIER,
+      role: 'CASHIER',
       branchId: '550e8400-e29b-41d4-a716-446655440001',
     },
   });
@@ -205,8 +196,8 @@ async function seed() {
       id: 'po1',
       branchId: '550e8400-e29b-41d4-a716-446655440001',
       supplierId: 's1',
-      status: PurchaseStatus.RECEIVED,
-      paymentType: PaymentMethod.CREDIT,
+      status: 'RECEIVED',
+      paymentType: 'CREDIT',
       totalAmount: 300_000,
       notes: 'Monthly restock',
       items: {
@@ -225,9 +216,9 @@ async function seed() {
       branchId: '550e8400-e29b-41d4-a716-446655440001',
       customerName: 'City Mart',
       address: 'No 1, Pyay Rd',
-      status: DistributionStatus.PENDING,
+      status: 'PENDING',
       total: 150_000,
-      paymentType: PaymentMethod.CREDIT,
+      paymentType: 'CREDIT',
       items: {
         create: [
           { id: 'di1', productId: 'p1', name: 'Paracetamol', quantity: 100, price: 400 },
@@ -239,20 +230,18 @@ async function seed() {
 
   await prisma.transaction.createMany({
     data: [
-      { id: 't1', branchId: '550e8400-e29b-41d4-a716-446655440001', type: TransactionType.INCOME, category: 'Sales', amount: 15_000, date: new Date('2024-03-10'), description: 'Daily sales', paymentMethod: PaymentMethod.CASH },
-      { id: 't2', branchId: '550e8400-e29b-41d4-a716-446655440001', type: TransactionType.EXPENSE, category: 'Utilities', amount: 50_000, date: new Date('2024-03-08'), description: 'Electricity Bill' },
-      { id: 't3', branchId: '550e8400-e29b-41d4-a716-446655440002', type: TransactionType.INCOME, category: 'Sales', amount: 25_000, date: new Date('2024-03-11'), description: 'Daily sales', paymentMethod: PaymentMethod.KBZ_PAY },
+      { id: 't1', branchId: '550e8400-e29b-41d4-a716-446655440001', type: 'INCOME', category: 'Sales', amount: 15_000, date: new Date('2024-03-10'), description: 'Daily sales', paymentMethod: 'CASH' },
+      { id: 't2', branchId: '550e8400-e29b-41d4-a716-446655440001', type: 'EXPENSE', category: 'Utilities', amount: 50_000, date: new Date('2024-03-08'), description: 'Electricity Bill' },
+      { id: 't3', branchId: '550e8400-e29b-41d4-a716-446655440002', type: 'INCOME', category: 'Sales', amount: 25_000, date: new Date('2024-03-11'), description: 'Daily sales', paymentMethod: 'KBZ_PAY' },
     ],
-    skipDuplicates: true,
   });
 
   await prisma.expense.createMany({
     data: [
-      { id: 'e1', branchId: '550e8400-e29b-41d4-a716-446655440001', category: 'Rent', amount: 300_000, date: new Date('2024-03-01'), description: 'Shop rent', status: ExpenseStatus.PAID },
-      { id: 'e2', branchId: '550e8400-e29b-41d4-a716-446655440001', category: 'Salary', amount: 150_000, date: new Date('2024-03-01'), description: 'Staff salary', status: ExpenseStatus.PAID },
-      { id: 'e3', branchId: '550e8400-e29b-41d4-a716-446655440001', category: 'Maintenance', amount: 25_000, date: new Date('2024-03-10'), description: 'AC Repair', status: ExpenseStatus.PENDING },
+      { id: 'e1', branchId: '550e8400-e29b-41d4-a716-446655440001', category: 'Rent', amount: 300_000, date: new Date('2024-03-01'), description: 'Shop rent', status: 'PAID' },
+      { id: 'e2', branchId: '550e8400-e29b-41d4-a716-446655440001', category: 'Salary', amount: 150_000, date: new Date('2024-03-01'), description: 'Staff salary', status: 'PAID' },
+      { id: 'e3', branchId: '550e8400-e29b-41d4-a716-446655440001', category: 'Maintenance', amount: 25_000, date: new Date('2024-03-10'), description: 'AC Repair', status: 'PENDING' },
     ],
-    skipDuplicates: true,
   });
 
   await prisma.payable.create({
@@ -264,7 +253,7 @@ async function seed() {
       invoiceNo: 'INV-001',
       amount: 300_000,
       dueDate: new Date('2024-03-31'),
-      status: AgingStatus.DUE_SOON,
+      status: 'DUE_SOON',
     },
   });
 
@@ -276,7 +265,7 @@ async function seed() {
       orderRef: 'ord1',
       amount: 150_000,
       dueDate: new Date('2024-03-20'),
-      status: AgingStatus.NORMAL,
+      status: 'NORMAL',
     },
   });
 

@@ -1,21 +1,21 @@
 import { Product, Role, User, Customer, Transaction, DistributionOrder, PurchaseOrder, Expense, Payable, Receivable, Supplier } from './types';
 
 // Branches
-// b1: Parami(1) Dawei
-// b2: Parami(2) Yangon
+// b1: Ko Hnit Aung (1) Dawei
+// b2: Ko Hnit Aung (2) Yangon
 
 export const mockUsers: User[] = [
   {
     id: 'u1',
-    name: 'Kaung Kaung',
-    email: 'admin@parami.com',
+    name: 'ကိုနှစ်အောင်',
+    email: 'admin@kohnitaung.com',
     role: Role.ADMIN,
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'
   },
   {
     id: 'u2',
-    name: 'Kyaw Kyaw',
-    email: 'pos@parami.com',
+    name: 'ငွေကိုင်ဝန်ထမ်း',
+    email: 'pos@kohnitaung.com',
     role: Role.CASHIER,
     avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
     branchId: 'b1'

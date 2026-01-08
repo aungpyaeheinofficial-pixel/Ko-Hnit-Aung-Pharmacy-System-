@@ -1,6 +1,6 @@
-# Parami Pharmacy Backend
+# Ko Hnit Aung Pharmacy Backend
 
-Node.js + Express + Prisma API that powers the Parami Pharmacy System UI.
+Node.js + Express + Prisma API that powers the Ko Hnit Aung Pharmacy System UI.
 
 ## Requirements
 
@@ -58,20 +58,20 @@ The Prisma schema (`prisma/schema.prisma`) models:
    ```bash
    sudo mysql_secure_installation
    mysql -u root -p
-   CREATE DATABASE parami_pharmacy;
-   CREATE USER 'parami'@'%' IDENTIFIED BY 'strongpassword';
-   GRANT ALL PRIVILEGES ON parami_pharmacy.* TO 'parami'@'%';
+   CREATE DATABASE ko_hnit_aung_pharmacy;
+   CREATE USER 'kohnitaung'@'%' IDENTIFIED BY 'strongpassword';
+   GRANT ALL PRIVILEGES ON ko_hnit_aung_pharmacy.* TO 'kohnitaung'@'%';
    FLUSH PRIVILEGES;
    ```
 3. **Code Deploy via Bare Repo**
    ```bash
-   sudo mkdir -p /var/www/parami-backend
-   sudo chown -R $USER:$USER /var/www/parami-backend
-   git init --bare /opt/parami-backend.git
-   cat <<'HOOK' | sudo tee /opt/parami-backend.git/hooks/post-receive
+   sudo mkdir -p /var/www/ko-hnit-aung-backend
+   sudo chown -R $USER:$USER /var/www/ko-hnit-aung-backend
+   git init --bare /opt/ko-hnit-aung-backend.git
+   cat <<'HOOK' | sudo tee /opt/ko-hnit-aung-backend.git/hooks/post-receive
    #!/bin/bash
-   TARGET=/var/www/parami-backend
-   GIT_DIR=/opt/parami-backend.git
+   TARGET=/var/www/ko-hnit-aung-backend
+   GIT_DIR=/opt/ko-hnit-aung-backend.git
    BRANCH=main
 
    if [ ! -d "$TARGET" ]; then
@@ -85,20 +85,20 @@ The Prisma schema (`prisma/schema.prisma`) models:
    npx prisma migrate deploy
    npm run build
 
-   pm2 restart parami-api || pm2 start dist/server.js --name parami-api
+   pm2 restart ko-hnit-aung-api || pm2 start dist/server.js --name ko-hnit-aung-api
    HOOK
    sudo chmod +x /opt/parami-backend.git/hooks/post-receive
    ```
 
    On your local machine:
    ```bash
-   git remote add production ssh://user@server-ip/opt/parami-backend.git
+   git remote add production ssh://user@server-ip/opt/ko-hnit-aung-backend.git
    git push production main
    ```
 
 4. **Environment**
 
-   Create `/var/www/parami-backend/backend/.env` with the same keys as `env.example`.
+   Create `/var/www/ko-hnit-aung-backend/backend/.env` with the same keys as `env.example`.
 
 5. **Nginx Reverse Proxy**
    ```nginx
@@ -125,8 +125,8 @@ The Prisma schema (`prisma/schema.prisma`) models:
 
 7. **Backups**
    ```bash
-   cat <<'CRON' | sudo tee /etc/cron.d/parami-backup
-   0 2 * * * root mysqldump -u parami -p'strongpassword' parami_pharmacy | gzip > /var/backups/parami-$(date +\%F).sql.gz
+   cat <<'CRON' | sudo tee /etc/cron.d/ko-hnit-aung-backup
+   0 2 * * * root mysqldump -u kohnitaung -p'strongpassword' ko_hnit_aung_pharmacy | gzip > /var/backups/ko-hnit-aung-$(date +\%F).sql.gz
    CRON
    ```
 
