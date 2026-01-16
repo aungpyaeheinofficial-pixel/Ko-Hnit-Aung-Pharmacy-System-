@@ -95,12 +95,23 @@ export const api = {
 
   post: async (endpoint: string, data: any) => {
     try {
-      const res = await fetch(`${BASE_URL}${endpoint}`, {
+      const url = `${BASE_URL}${endpoint}`;
+      const res = await fetch(url, {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify(data),
       });
+      
       if (!res.ok) {
+        // Handle 405 specifically
+        if (res.status === 405) {
+          throw new Error(
+            `Method not allowed. Please check:\n` +
+            `1. Backend server is running on port 4000\n` +
+            `2. API endpoint is correct: ${url}\n` +
+            `3. Backend route accepts POST requests`
+          );
+        }
         const errorMessage = await getErrorMessage(res);
         throw new Error(errorMessage);
       }
