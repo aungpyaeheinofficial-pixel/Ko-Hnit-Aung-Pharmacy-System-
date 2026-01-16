@@ -1,0 +1,197 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import { prisma } from '../../config/prisma';
+import { createError } from '../../lib/http-error';
+import { requireAuth } from '../../middleware/auth';
+
+const batchSchema = z.object({
+  batchNumber: z.string().min(1),
+  expiryDate: z.string().transform((val) => new Date(val)),
+  quantity: z.number().int(),
+  costPrice: z.number().int().nonnegative(),
+});
+
+const productSchema = z.object({
+  branchId: z.string().uuid(),
+  sku: z.string().min(4),
+  gtin: z.string().min(4).optional(),
+  nameEn: z.string().min(2),
+  nameMm: z.string().min(2),
+  // Allow nulls from existing data / UI for optional text fields
+  genericName: z.string().nullable().optional(),
+  category: z.string().min(2),
+  description: z.string().nullable().optional(),
+  price: z.number().int().nonnegative(),
+  unit: z.string().min(1),
+  // Allow direct stock editing from Inventory UI
+  stockLevel: z.number().int().nonnegative().default(0),
+  minStockLevel: z.number().int().nonnegative().default(0),
+  requiresPrescription: z.boolean().default(false),
+  imageUrl: z.string().url().nullable().optional(),
+  location: z.string().nullable().optional(),
+  batches: z.array(batchSchema).optional(), // allow creating batches on new product
+});
+
+export const productRouter = Router();
+
+productRouter.use(requireAuth);
+
+productRouter.get('/', async (req, res, next) => {
+  try {
+    const { branchId } = req.query;
+    const products = await prisma.product.findMany({
+      where: branchId ? { branchId: String(branchId) } : undefined,
+      include: { batches: true },
+      orderBy: { nameEn: 'asc' },
+    });
+    res.json({ products });
+  } catch (error) {
+    next(error);
+  }
+});
+
+productRouter.post('/', async (req, res, next) => {
+  try {
+    const input = productSchema.parse(req.body);
+    const product = await prisma.product.create({
+      data: {
+        ...input,
+        batches: input.batches
+          ? {
+              create: input.batches,
+            }
+          : undefined,
+      },
+    });
+    res.status(201).json({ product });
+  } catch (error) {
+    next(error);
+  }
+});
+
+productRouter.patch('/:id', async (req, res, next) => {
+  try {
+    const input = productSchema.partial().parse(req.body);
+    // Do not allow updating branchId or batches from this endpoint
+    const { batches, branchId, ...productData } = input;
+    const product = await prisma.product.update({
+      where: { id: req.params.id },
+      data: productData,
+    });
+    res.json({ product });
+  } catch (error) {
+    next(error);
+  }
+});
+
+productRouter.delete('/:id', async (req, res, next) => {
+  try {
+    await prisma.product.delete({ where: { id: req.params.id } });
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+});
+
+productRouter.post('/:id/batches', async (req, res, next) => {
+  try {
+    const input = batchSchema.parse(req.body);
+    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+    if (!product) {
+      throw createError(404, 'Product not found');
+    }
+
+    const batch = await prisma.productBatch.upsert({
+      where: {
+        productId_batchNumber: {
+          productId: req.params.id,
+          batchNumber: input.batchNumber,
+        },
+      },
+      update: {
+        ...input,
+      },
+      create: {
+        productId: req.params.id,
+        ...input,
+      },
+    });
+
+    res.status(201).json({ batch });
+  } catch (error) {
+    next(error);
+  }
+});
+
+productRouter.post('/:id/stock-adjust', async (req, res, next) => {
+  try {
+    const payload = z
+      .object({
+        quantity: z.number().int(),
+        batchNumber: z.string().optional(),
+        expiryDate: z.string().optional(),
+        costPrice: z.number().int().nonnegative().optional(),
+        location: z.string().optional(),
+        unit: z.string().optional(),
+      })
+      .parse(req.body);
+
+    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+    if (!product) {
+      throw createError(404, 'Product not found');
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.product.update({
+        where: { id: req.params.id },
+        data: {
+          stockLevel: product.stockLevel + payload.quantity,
+          location: payload.location ?? undefined,
+          unit: payload.unit ?? undefined,
+        },
+      });
+
+      // Auto-generate batch number from expiry date if not provided but expiry date exists
+      let batchNumber = payload.batchNumber;
+      if (!batchNumber && payload.expiryDate) {
+        const expiryDate = new Date(payload.expiryDate);
+        // Format: YYYYMMDD (e.g., 20251231)
+        batchNumber = expiryDate.toISOString().split('T')[0].replace(/-/g, '');
+      }
+
+      // Create batch if batchNumber exists or expiryDate is provided
+      if (batchNumber || payload.expiryDate) {
+        const finalBatchNumber = batchNumber || `BATCH-${Date.now()}`;
+        const expiryDate = payload.expiryDate 
+          ? new Date(payload.expiryDate) 
+          : new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+
+        await tx.productBatch.upsert({
+          where: {
+            productId_batchNumber: {
+              productId: req.params.id,
+              batchNumber: finalBatchNumber,
+            },
+          },
+          update: {
+            quantity: { increment: payload.quantity },
+            expiryDate: expiryDate,
+            costPrice: payload.costPrice ?? undefined,
+          },
+          create: {
+            productId: req.params.id,
+            batchNumber: finalBatchNumber,
+            expiryDate: expiryDate,
+            quantity: payload.quantity,
+            costPrice: payload.costPrice ?? 0,
+          },
+        });
+      }
+    });
+
+    res.json({ message: 'Stock updated' });
+  } catch (error) {
+    next(error);
+  }
+});
+

@@ -1,0 +1,7 @@
+{
+  "name": "ကိုနှစ်အောင် ဆေးဆိုင် စီမံခန့်ခွဲမှု စနစ်",
+  "description": "Professional Pharmacy & Distribution System for Ko Hnit Aung Pharmacy with POS, Inventory, and Analytics.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
